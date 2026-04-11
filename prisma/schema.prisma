@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+ 
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Entry {
+  id        String   @id @default(cuid())
+  name      String   // English name (UI pe Hindi convert hoga)
+  unit      Int      // number of members
+  cardType  CardType // ration category
+  createdAt DateTime @default(now())
+}
+
+enum CardType {
+  AAY
+  SYF
+  PHH
+}
