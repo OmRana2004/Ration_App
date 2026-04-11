@@ -17,7 +17,7 @@ model Entry {
 }
 
 enum CardType {
+  SFY
   AAY
-  SYF
   PHH
 }
