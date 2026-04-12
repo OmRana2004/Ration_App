@@ -22,14 +22,12 @@ export default function Viewer() {
 
   const [spin, setSpin] = useState(false);
 
-  // FETCH DATA
   const fetchData = async () => {
     try {
       let url = "/api/get-entries";
       if (from && to) url += `?from=${from}&to=${to}`;
 
       const res = await fetch(url, { cache: "no-store" });
-
       if (!res.ok) throw new Error("Fetch failed");
 
       const data = await res.json();
@@ -48,14 +46,6 @@ export default function Viewer() {
     }
   };
 
-  // SET DATE
-  useEffect(() => {
-    const today = new Date().toISOString().split("T")[0];
-    setFrom(today);
-    setTo(today);
-  }, []);
-
-  // AUTO REFRESH
   useEffect(() => {
     let isMounted = true;
 
@@ -76,7 +66,6 @@ export default function Viewer() {
     };
   }, [from, to]);
 
-  // SEARCH
   useEffect(() => {
     const filteredData = entries.filter((e: any) =>
       e.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -85,7 +74,6 @@ export default function Viewer() {
     setFiltered(filteredData);
   }, [search, entries]);
 
-  // CARD COUNT
   const cardTypesCount = useMemo(() => {
     const types = new Set(entries.map((e: any) => e.cardType));
     return types.size;
@@ -112,7 +100,7 @@ export default function Viewer() {
       </div>
 
       {/* STATS */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5 mb-6">
+      <div className="grid grid-cols-3 gap-2 sm:gap-5 mb-6">
         <div className="bg-blue-100 rounded-2xl p-5 text-center shadow">
           <Users className="mx-auto mb-2 text-blue-600" size={18} />
           <p className="text-xl sm:text-2xl font-bold">{totalPeople}</p>
@@ -133,8 +121,8 @@ export default function Viewer() {
       </div>
 
       {/* SEARCH + DATE */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <div className="flex items-center bg-white rounded-xl px-4 h-11 shadow w-full">
+      <div className="flex gap-2 mb-6">
+        <div className="flex items-center bg-white rounded-xl px-4 h-11 shadow min-w-[40%]">
           <Search size={16} className="text-gray-400 mr-2" />
           <input
             placeholder="Search name or card type..."
@@ -145,90 +133,88 @@ export default function Viewer() {
         </div>
 
         <input
-          type="date"
-          value={from}
-          onChange={(e) => setFrom(e.target.value)}
-          className="bg-white rounded-xl px-3 h-11 shadow text-sm w-full sm:w-auto"
-        />
+  type="date"
+  value={from}
+  onChange={(e) => setFrom(e.target.value)}
+  className="bg-white rounded-xl px-2 h-11 shadow text-sm w-[30%]"
+/>
 
-        <input
-          type="date"
-          value={to}
-          onChange={(e) => setTo(e.target.value)}
-          className="bg-white rounded-xl px-3 h-11 shadow text-sm w-full sm:w-auto"
-        />
+<input
+  type="date"
+  value={to}
+  onChange={(e) => setTo(e.target.value)}
+  className="bg-white rounded-xl px-2 h-11 shadow text-sm w-[30%]"
+/>
       </div>
 
-      {/* TABLE WRAPPER */}
-      <div className="overflow-x-auto">
-        <div className="min-w-125">
+      {/* TABLE (FIXED — NO SCROLL) */}
+      <div>
 
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
 
-            {/* HEADER */}
-            <div className="grid grid-cols-[40px_1fr_120px_160px] px-6 py-4 text-xs sm:text-sm text-gray-600 font-semibold bg-gray-200">
-              <p>#</p>
-              <p>NAME</p>
-              <p className="text-center">UNITS</p>
-              <p className="text-center">CARD TYPE</p>
-            </div>
+          {/* HEADER */}
+          <div className="grid grid-cols-[30px_1fr_70px_90px] px-6 py-4 text-xs sm:text-sm text-gray-600 font-semibold bg-gray-200">
+            <p>#</p>
+            <p>NAME</p>
+            <p className="text-center">UNITS</p>
+            <p className="text-center">CARD TYPE</p>
+          </div>
 
-            {/* ROWS */}
-            {filtered.map((e: any, i) => (
-              <div
-                key={e.id}
-                className={`grid grid-cols-[40px_1fr_120px_160px] px-6 py-2 items-center border-t border-gray-200
-                ${i % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
-              >
-                <p className="text-gray-400 text-xs sm:text-sm">{i + 1}</p>
+          {/* ROWS */}
+          {filtered.map((e: any, i) => (
+            <div
+              key={e.id}
+              className={`grid grid-cols-[30px_1fr_70px_90px] px-6 py-2 items-center border-t border-gray-200
+              ${i % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+            >
+              <p className="text-gray-400 text-xs sm:text-sm">{i + 1}</p>
 
-                <p className="font-medium text-gray-800 text-xs sm:text-sm">{e.name}</p>
+              <p className="font-semibold text-gray-800 text-xs sm:text-sm">{e.name}</p>
 
-                <div className="flex justify-center">
-                  <span className="w-6 h-6 sm:w-9 sm:h-9 flex items-center justify-center bg-gray-200 rounded-full text-xs sm:text-sm font-medium">
-                    {e.unit}
-                  </span>
-                </div>
-
-                <div className="flex justify-center">
-                  <span
-                    className={`px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium ${
-                      e.cardType === "AAY"
-                        ? "bg-yellow-100 text-yellow-600"
-                        : e.cardType === "PHH"
-                        ? "bg-blue-100 text-blue-600"
-                        : "bg-green-100 text-green-600"
-                    }`}
-                  >
-                    {e.cardType}
-                  </span>
-                </div>
+              <div className="flex justify-center">
+                <span className="w-6 h-6 sm:w-9 sm:h-9 flex items-center justify-center bg-gray-50 rounded-full text-red-500 text-xs sm:text-sm font-medium">
+                  {e.unit}
+                </span>
               </div>
-            ))}
 
-            {/* TOTAL */}
-            <div className="grid grid-cols-[40px_1fr_120px_160px] px-6 py-4 items-center border-t border-gray-300 bg-gray-200 font-bold text-xs sm:text-sm">
-              <p></p>
-              <p>Total Ration Distribution</p>
-
-              <div className="text-center text-gray-800">
-                {filtered.length} People
+              <div className="flex justify-center">
+                <span
+                  className={`px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium ${
+                    e.cardType === "AAY"
+                      ? "bg-yellow-100 text-yellow-600"
+                      : e.cardType === "PHH"
+                      ? "bg-blue-100 text-blue-600"
+                      : "bg-green-100 text-green-600"
+                  }`}
+                >
+                  {e.cardType}
+                </span>
               </div>
             </div>
+          ))}
 
-            {/* FOOTER */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-6 py-4 text-xs sm:text-sm text-gray-400 border-t border-gray-200 gap-2">
-              <p>Showing {filtered.length} of {entries.length} records</p>
+          {/* TOTAL */}
+          <div className="grid grid-cols-[30px_1fr_70px_90px] px-6 py-4 items-center border-t border-gray-300 bg-gray-200 font-bold text-xs sm:text-sm">
+            <p></p>
+            <p>Total Ration Distribution</p>
 
-              <p className="text-green-500 flex items-center gap-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                Auto-refreshing
-              </p>
+            <div className="text-center text-gray-800">
+              {filtered.length} People
             </div>
+          </div>
 
+          {/* FOOTER */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-6 py-4 text-xs sm:text-sm text-gray-400 border-t border-gray-200 gap-2">
+            <p>Showing {filtered.length} of {entries.length} records</p>
+
+            <p className="text-green-500 flex items-center gap-2">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              Auto-refreshing
+            </p>
           </div>
 
         </div>
+
       </div>
     </div>
   );
