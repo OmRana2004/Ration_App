@@ -14,14 +14,21 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Ration Distribution Live Tracking System",
-  description: "A live tracking system for ration distribution built with Next.js, Prisma, and Tailwind CSS.",
+  description:
+    "A live tracking system for ration distribution built with Next.js, Prisma, and Tailwind CSS.",
+};
+
+//  ADD THIS
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html
       lang="en"
