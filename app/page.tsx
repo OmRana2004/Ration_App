@@ -121,8 +121,8 @@ export default function Viewer() {
       </div>
 
       {/* SEARCH + DATE */}
-      <div className="flex gap-2 mb-6">
-        <div className="flex items-center bg-white rounded-xl px-4 h-11 shadow min-w-[40%]">
+      <div className="flex gap-2 mb-6 flex-wrap">
+        <div className="flex items-center bg-white rounded-xl px-4 h-11 shadow w-full sm:min-w-[40%]">
           <Search size={16} className="text-gray-400 mr-2" />
           <input
             placeholder="Search name or card type..."
@@ -136,14 +136,14 @@ export default function Viewer() {
   type="date"
   value={from}
   onChange={(e) => setFrom(e.target.value)}
-  className="bg-white rounded-xl px-2 h-11 shadow text-sm w-[30%]"
+className="bg-white rounded-xl px-2 h-11 shadow text-sm w-[48%] sm:w-[30%]"
 />
 
 <input
   type="date"
   value={to}
   onChange={(e) => setTo(e.target.value)}
-  className="bg-white rounded-xl px-2 h-11 shadow text-sm w-[30%]"
+  className="bg-white rounded-xl px-2 h-11 shadow text-sm w-[48%] sm:w-[30%]"
 />
       </div>
 
@@ -169,7 +169,7 @@ export default function Viewer() {
             >
               <p className="text-gray-400 text-xs sm:text-sm">{i + 1}</p>
 
-              <p className="font-semibold text-gray-800 text-xs sm:text-sm">{e.name}</p>
+              <p className="font-semibold text-gray-900 text-sm sm:text-base">{e.name}</p>
 
               <div className="flex justify-center">
                 <span className="w-6 h-6 sm:w-9 sm:h-9 flex items-center justify-center bg-gray-50 rounded-full text-red-500 text-xs sm:text-sm font-medium">
