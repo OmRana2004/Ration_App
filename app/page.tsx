@@ -121,7 +121,7 @@ export default function Viewer() {
       </div>
 
       {/* SEARCH + DATE */}
-      <div className="flex gap-2 mb-6 flex-wrap">
+      <div className="flex gap-2 mb-6">
         <div className="flex items-center bg-white rounded-xl px-4 h-11 shadow w-full sm:min-w-[40%]">
           <Search size={16} className="text-gray-400 mr-2" />
           <input
