@@ -1,13 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import {
-  RefreshCcw,
-  Users,
-  Box,
-  CreditCard,
-  Search,
-} from "lucide-react";
+import { RefreshCcw, Users, Box, CreditCard, Search } from "lucide-react";
 
 export default function Viewer() {
   const [entries, setEntries] = useState([]);
@@ -36,10 +30,7 @@ export default function Viewer() {
       setFiltered(data);
       setTotalPeople(data.length);
 
-      const units = data.reduce(
-        (sum: number, item: any) => sum + item.unit,
-        0
-      );
+      const units = data.reduce((sum: number, item: any) => sum + item.unit, 0);
       setTotalUnits(units);
     } catch (err) {
       console.log("Fetch error:", err);
@@ -67,9 +58,10 @@ export default function Viewer() {
   }, [from, to]);
 
   useEffect(() => {
-    const filteredData = entries.filter((e: any) =>
-      e.name.toLowerCase().includes(search.toLowerCase()) ||
-      e.cardType.toLowerCase().includes(search.toLowerCase())
+    const filteredData = entries.filter(
+      (e: any) =>
+        e.name.toLowerCase().includes(search.toLowerCase()) ||
+        e.cardType.toLowerCase().includes(search.toLowerCase()),
     );
     setFiltered(filteredData);
   }, [search, entries]);
@@ -81,7 +73,6 @@ export default function Viewer() {
 
   return (
     <div className="min-h-screen bg-[#f6f8fb] p-3 sm:p-6">
-
       {/* HEADER */}
       <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
         <div className="flex items-center gap-3">
@@ -132,26 +123,40 @@ export default function Viewer() {
           />
         </div>
 
-        <input
-  type="date"
-  value={from}
-  onChange={(e) => setFrom(e.target.value)}
-className="bg-white rounded-xl px-2 h-11 shadow text-sm w-[48%] sm:w-[30%]"
-/>
+        {/* FROM DATE */}
+        <div className="relative w-[48%] sm:w-[30%]">
+          {!from && (
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">
+              From date
+            </span>
+          )}
+          <input
+            type="date"
+            value={from}
+            onChange={(e) => setFrom(e.target.value)}
+            className="bg-white rounded-xl px-2 h-11 shadow text-sm w-full"
+          />
+        </div>
 
-<input
-  type="date"
-  value={to}
-  onChange={(e) => setTo(e.target.value)}
-  className="bg-white rounded-xl px-2 h-11 shadow text-sm w-[48%] sm:w-[30%]"
-/>
+        {/* TO DATE */}
+        <div className="relative w-[48%] sm:w-[30%]">
+          {!to && (
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">
+              To date
+            </span>
+          )}
+          <input
+            type="date"
+            value={to}
+            onChange={(e) => setTo(e.target.value)}
+            className="bg-white rounded-xl px-2 h-11 shadow text-sm w-full"
+          />
+        </div>
       </div>
 
       {/* TABLE (FIXED — NO SCROLL) */}
       <div>
-
         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-
           {/* HEADER */}
           <div className="grid grid-cols-[30px_1fr_70px_90px] px-6 py-4 text-xs sm:text-sm text-gray-600 font-semibold bg-gray-200">
             <p>#</p>
@@ -169,7 +174,9 @@ className="bg-white rounded-xl px-2 h-11 shadow text-sm w-[48%] sm:w-[30%]"
             >
               <p className="text-gray-400 text-xs sm:text-sm">{i + 1}</p>
 
-              <p className="font-semibold text-gray-900 text-sm sm:text-base">{e.name}</p>
+              <p className="font-semibold text-gray-900 text-sm sm:text-base">
+                {e.name}
+              </p>
 
               <div className="flex justify-center">
                 <span className="w-6 h-6 sm:w-9 sm:h-9 flex items-center justify-center bg-gray-50 rounded-full text-red-500 text-xs sm:text-sm font-medium">
@@ -183,8 +190,8 @@ className="bg-white rounded-xl px-2 h-11 shadow text-sm w-[48%] sm:w-[30%]"
                     e.cardType === "AAY"
                       ? "bg-yellow-100 text-yellow-600"
                       : e.cardType === "PHH"
-                      ? "bg-blue-100 text-blue-600"
-                      : "bg-green-100 text-green-600"
+                        ? "bg-blue-100 text-blue-600"
+                        : "bg-green-100 text-green-600"
                   }`}
                 >
                   {e.cardType}
@@ -205,16 +212,16 @@ className="bg-white rounded-xl px-2 h-11 shadow text-sm w-[48%] sm:w-[30%]"
 
           {/* FOOTER */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-6 py-4 text-xs sm:text-sm text-gray-400 border-t border-gray-200 gap-2">
-            <p>Showing {filtered.length} of {entries.length} records</p>
+            <p>
+              Showing {filtered.length} of {entries.length} records
+            </p>
 
             <p className="text-green-500 flex items-center gap-2">
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
               Auto-refreshing
             </p>
           </div>
-
         </div>
-
       </div>
     </div>
   );
