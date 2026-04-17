@@ -76,9 +76,11 @@ export default function Viewer() {
       {/* HEADER */}
       <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
         <div className="flex items-center gap-3">
-          <div className="bg-green-500 p-3 rounded-2xl text-white shadow">
-            <Box size={20} />
-          </div>
+          <a href="/admin">
+  <div className="bg-green-500 p-3 rounded-2xl text-white shadow cursor-pointer transition active:scale-95 hover:scale-105">
+    <Box size={20} />
+  </div>
+</a>
           <div>
             <h1 className="text-lg font-semibold">Ration Distribution</h1>
             <p className="text-sm text-gray-400">Live tracking system</p>
