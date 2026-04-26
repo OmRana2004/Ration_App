@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { RefreshCcw, Users, Box, CreditCard, Search } from "lucide-react";
 
 export default function Viewer() {
-  const [entries, setEntries] = useState([]);
-  const [filtered, setFiltered] = useState([]);
+  const [entries, setEntries] = useState<any[]>([]);
+  const [filtered, setFiltered] = useState<any[]>([]);
 
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -16,47 +16,53 @@ export default function Viewer() {
 
   const [spin, setSpin] = useState(false);
 
+  // ✅ helper to update state
+  const updateState = (data: any[]) => {
+    setEntries(data);
+    setFiltered(data);
+    setTotalPeople(data.length);
+
+    const units = data.reduce((sum, item) => sum + item.unit, 0);
+    setTotalUnits(units);
+  };
+
+  // ✅ fetch with retry (fix Neon sleep)
   const fetchData = async () => {
     try {
       let url = "/api/get-entries";
       if (from && to) url += `?from=${from}&to=${to}`;
 
-      const res = await fetch(url, { cache: "no-store" });
+      setSpin(true);
+
+      let res = await fetch(url, { cache: "no-store" });
+
+      // 🔥 retry once if DB sleeping
+      if (!res.ok) {
+        await new Promise((r) => setTimeout(r, 1500));
+        res = await fetch(url, { cache: "no-store" });
+      }
+
       if (!res.ok) throw new Error("Fetch failed");
 
       const data = await res.json();
-
-      setEntries(data);
-      setFiltered(data);
-      setTotalPeople(data.length);
-
-      const units = data.reduce((sum: number, item: any) => sum + item.unit, 0);
-      setTotalUnits(units);
+      updateState(data);
     } catch (err) {
       console.log("Fetch error:", err);
+    } finally {
+      setTimeout(() => setSpin(false), 800);
     }
   };
 
+  // ✅ clean interval instead of loop
   useEffect(() => {
-    let isMounted = true;
+    fetchData(); // initial load
 
-    const loop = async () => {
-      if (!isMounted) return;
+    const interval = setInterval(fetchData, 8000); // every 8 sec
 
-      setSpin(true);
-      await fetchData();
-      setTimeout(() => setSpin(false), 800);
-
-      setTimeout(loop, 4000);
-    };
-
-    loop();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => clearInterval(interval);
   }, [from, to]);
 
+  // ✅ search filter
   useEffect(() => {
     const filteredData = entries.filter(
       (e: any) =>
@@ -66,6 +72,7 @@ export default function Viewer() {
     setFiltered(filteredData);
   }, [search, entries]);
 
+  // ✅ unique card types
   const cardTypesCount = useMemo(() => {
     const types = new Set(entries.map((e: any) => e.cardType));
     return types.size;
@@ -77,10 +84,10 @@ export default function Viewer() {
       <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
         <div className="flex items-center gap-3">
           <a href="/admin">
-  <div className="bg-green-500 p-3 rounded-2xl text-white shadow cursor-pointer transition active:scale-95 hover:scale-105">
-    <Box size={20} />
-  </div>
-</a>
+            <div className="bg-green-500 p-3 rounded-2xl text-white shadow cursor-pointer transition active:scale-95 hover:scale-105">
+              <Box size={20} />
+            </div>
+          </a>
           <div>
             <h1 className="text-lg font-semibold">Ration Distribution</h1>
             <p className="text-sm text-gray-400">Live tracking system</p>

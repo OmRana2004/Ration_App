@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "CardType" AS ENUM ('AAY', 'SYF', 'PHH');
+CREATE TYPE "CardType" AS ENUM ('SFY', 'AAY', 'PHH');
 
 -- CreateTable
 CREATE TABLE "Entry" (

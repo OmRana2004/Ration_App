@@ -7,15 +7,28 @@ export default function Home() {
   const [name, setName] = useState("");
   const [unit, setUnit] = useState("");
   const [cardType, setCardType] = useState("AAY");
-  const [entries, setEntries] = useState([]);
+  const [entries, setEntries] = useState<any[]>([]);
   const [showAll, setShowAll] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const unitRef = useRef<HTMLInputElement>(null);
   const cardRef = useRef<HTMLSelectElement>(null);
 
+  // ✅ fetch with retry
   const fetchData = async () => {
-    const res = await fetch("/api/get-entries");
-    const data = await res.json();
-    setEntries(data);
+    try {
+      let res = await fetch("/api/get-entries");
+
+      if (!res.ok) {
+        await new Promise((r) => setTimeout(r, 1500));
+        res = await fetch("/api/get-entries");
+      }
+
+      const data = await res.json();
+      setEntries(data);
+    } catch (err) {
+      console.log("Fetch error:", err);
+    }
   };
 
   useEffect(() => {
@@ -29,7 +42,9 @@ export default function Home() {
     }
 
     try {
-      const res = await fetch("/api/add-entry", {
+      setLoading(true);
+
+      let res = await fetch("/api/add-entry", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -41,24 +56,40 @@ export default function Home() {
         }),
       });
 
+      // 🔥 retry if DB sleeping
       if (!res.ok) {
-        throw new Error("Failed");
+        await new Promise((r) => setTimeout(r, 1500));
+        res = await fetch("/api/add-entry", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            unit: Number(unit),
+            cardType,
+          }),
+        });
       }
 
-      //  SUCCESS (no popup)
+      if (!res.ok) throw new Error("Failed");
+
+      // ✅ success
       setName("");
       setUnit("");
+      fetchData();
 
-      fetchData(); // refresh silently
     } catch (error) {
-      //  ONLY ERROR POPUP
       alert("❌ Failed to add. Please try again");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-[#f6f8fb] p-4">
       <div className="max-w-md mx-auto">
+
         {/* FORM CARD */}
         <div className="bg-white rounded-2xl shadow-md p-4 mb-4">
           <div className="flex items-center gap-3 mb-4">
@@ -102,35 +133,31 @@ export default function Home() {
           </div>
 
           {/* CARD TYPE */}
-          <div className="mb-3">
-            <label className="text-xs text-gray-400 mb-1 block">
-              Card Type
-            </label>
+          <select
+            ref={cardRef}
+            value={cardType}
+            onChange={(e) => setCardType(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleAdd();
+            }}
+            className="w-full h-11 px-4 rounded-xl bg-gray-50 text-sm outline-none mb-3"
+          >
+            <option value="AAY">AAY</option>
+            <option value="SYF">SYF</option>
+            <option value="PHH">PHH</option>
+          </select>
 
-            <select
-              ref={cardRef}
-              value={cardType}
-              onChange={(e) => setCardType(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleAdd();
-              }}
-              className="w-full h-11 px-4 rounded-xl bg-gray-50 text-sm outline-none touch-manipulation active:scale-[0.99]"
-            >
-              <option value="AAY">AAY</option>
-              <option value="SYF">SYF</option>
-              <option value="PHH">PHH</option>
-            </select>
-          </div>
-
+          {/* BUTTON */}
           <button
             onClick={handleAdd}
-            className="w-full bg-blue-500 hover:bg-blue-600 transition text-white py-1.5 rounded-xl font-medium"
+            disabled={loading}
+            className="w-full bg-blue-500 hover:bg-blue-600 transition text-white py-1.5 rounded-xl font-medium disabled:opacity-50"
           >
-            Add Person
+            {loading ? "Adding..." : "Add Person"}
           </button>
         </div>
 
-        {/* PEOPLE LIST */}
+        {/* LIST */}
         <div className="bg-white rounded-2xl shadow-md p-3">
           <h2 className="text-sm font-semibold text-gray-500 mb-3">
             Recent Entries
@@ -141,30 +168,16 @@ export default function Home() {
           ) : (
             <>
               {(showAll ? entries : entries.slice(0, 10)).map((e: any, i) => (
-                <div
-                  key={e.id}
-                  className="flex justify-between items-center py-1.5 border-b last:border-none"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-400 w-3">{i + 1}.</span>
-                    <p className="font-medium text-gray-800">{e.name}</p>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500">{e.unit}</span>
-
-                    <span className="text-xs px-2 py-1 bg-gray-100 rounded">
-                      {e.cardType}
-                    </span>
-                  </div>
+                <div key={e.id} className="flex justify-between py-1.5 border-b">
+                  <p>{i + 1}. {e.name}</p>
+                  <p>{e.unit} ({e.cardType})</p>
                 </div>
               ))}
 
-              {/* VIEW ALL BUTTON */}
               {entries.length > 10 && (
                 <button
                   onClick={() => setShowAll(!showAll)}
-                  className="w-full mt-3 text-blue-500 text-sm font-medium hover:underline"
+                  className="w-full mt-3 text-blue-500 text-sm"
                 >
                   {showAll ? "Show Less ▲" : "View All ▼"}
                 </button>

@@ -1,5 +1,24 @@
 import { prisma } from "@/db/index";
 
+async function fetchEntries(where: any, retries = 3) {
+  try {
+    return await prisma.entry.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (err: any) {
+    if (retries > 0) {
+      console.log("DB sleeping... retrying");
+
+      await new Promise((res) => setTimeout(res, 2000));
+
+      return fetchEntries(where, retries - 1);
+    }
+
+    throw err;
+  }
+}
+
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
@@ -10,28 +29,20 @@ export async function GET(req: Request) {
     let where: any = {};
 
     if (from && to) {
-      // FIX: manually build date range (no timezone issue)
-      const fromDate = new Date(`${from}T00:00:00.000Z`);
-      const toDate = new Date(`${to}T23:59:59.999Z`);
-
       where.createdAt = {
-        gte: fromDate,
-        lte: toDate,
+        gte: new Date(`${from}T00:00:00.000Z`),
+        lte: new Date(`${to}T23:59:59.999Z`),
       };
     }
 
-    const entries = await prisma.entry.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-    });
+    const entries = await fetchEntries(where);
 
     return Response.json(entries);
 
   } catch (error) {
-    console.error(error);
-    return Response.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    console.error("FINAL DB FAIL:", error);
+
+    // never break UI
+    return Response.json([], { status: 200 });
   }
 }

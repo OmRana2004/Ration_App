@@ -4,11 +4,20 @@ async function createEntryWithRetry(data: any, retries = 3) {
   try {
     return await prisma.entry.create({ data });
   } catch (err: any) {
-    if (retries > 0 && err.code === "P1001") {
+    console.log("DB ERROR:", err?.code || err?.message);
+
+    // 🔥 retry for connection-related errors
+    if (
+      retries > 0 &&
+      (err?.code === "P1001" || err?.message?.includes("Can't reach database"))
+    ) {
       console.log("DB sleeping... retrying");
-      await new Promise((res) => setTimeout(res, 1000));
+
+      await new Promise((res) => setTimeout(res, 1500));
+
       return createEntryWithRetry(data, retries - 1);
     }
+
     throw err;
   }
 }
@@ -16,8 +25,6 @@ async function createEntryWithRetry(data: any, retries = 3) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-
-    console.log("BODY:", body);
 
     const { name, unit, cardType } = body;
 
@@ -40,7 +47,7 @@ export async function POST(req: Request) {
     console.error("ADD ERROR:", error);
 
     return Response.json(
-      { error: "Database error" },
+      { error: "Database temporarily unavailable" },
       { status: 500 }
     );
   }
