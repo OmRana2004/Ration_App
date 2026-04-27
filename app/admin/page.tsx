@@ -143,7 +143,7 @@ export default function Home() {
             className="w-full h-11 px-4 rounded-xl bg-gray-50 text-sm outline-none mb-3"
           >
             <option value="AAY">AAY</option>
-            <option value="SYF">SYF</option>
+            <option value="SFY">SFY</option>
             <option value="PHH">PHH</option>
           </select>
 
