@@ -28,9 +28,20 @@ export async function POST(req: Request) {
 
     const { name, unit, cardType } = body;
 
+    // Basic validation
     if (!name || !unit || !cardType) {
       return Response.json(
         { error: "Missing fields" },
+        { status: 400 }
+      );
+    }
+
+    // ENUM validation
+    const validTypes = ["SFY", "AAY", "PHH"];
+    
+    if (!validTypes.includes(cardType)) {
+      return Response.json(
+        { error: "Invalid card type" },
         { status: 400 }
       );
     }
