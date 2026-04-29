@@ -63,3 +63,24 @@ export async function POST(req: Request) {
     );
   }
 }
+
+// 🗑️ DELETE (ALL ENTRIES)
+
+export async function DELETE() {
+  try {
+    const result = await prisma.entry.deleteMany({});
+
+    return Response.json({
+      message: "All entries deleted successfully",
+      deletedCount: result.count,
+    });
+
+  } catch (error) {
+    console.error("DELETE ERROR:", error);
+
+    return Response.json(
+      { error: "Failed to delete entries" },
+      { status: 500 }
+    );
+  }
+}

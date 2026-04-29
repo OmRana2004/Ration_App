@@ -35,6 +35,7 @@ export default function Home() {
     fetchData();
   }, []);
 
+  // ✅ ADD ENTRY
   const handleAdd = async () => {
     if (!name || !unit) {
       alert("Fill all fields");
@@ -56,7 +57,7 @@ export default function Home() {
         }),
       });
 
-      // 🔥 retry if DB sleeping
+      // retry if DB sleeping
       if (!res.ok) {
         await new Promise((r) => setTimeout(r, 1500));
         res = await fetch("/api/add-entry", {
@@ -74,7 +75,6 @@ export default function Home() {
 
       if (!res.ok) throw new Error("Failed");
 
-      // ✅ success
       setName("");
       setUnit("");
       fetchData();
@@ -83,6 +83,27 @@ export default function Home() {
       alert("❌ Failed to add. Please try again");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // ✅ DELETE ALL
+  const handleDeleteAll = async () => {
+    const confirmDelete = confirm("⚠️ Delete ALL entries?");
+
+    if (!confirmDelete) return;
+
+    try {
+      const res = await fetch("/api/add-entry", {
+        method: "DELETE",
+      });
+
+      if (!res.ok) throw new Error("Delete failed");
+
+      setEntries([]);
+      alert("✅ All entries deleted");
+
+    } catch (err) {
+      alert("❌ Failed to delete");
     }
   };
 
@@ -185,6 +206,16 @@ export default function Home() {
             </>
           )}
         </div>
+
+        {/* 🔴 DELETE BUTTON */}
+        <button
+          onClick={handleDeleteAll}
+          disabled={entries.length === 0}
+          className="w-full mt-4 bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl font-medium transition disabled:opacity-50"
+        >
+          Delete All Entries
+        </button>
+
       </div>
     </div>
   );
