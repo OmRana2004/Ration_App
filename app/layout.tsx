@@ -1,14 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google"; // 1. Changed import to Inter
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// 2. Initialized Inter font
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -18,7 +14,6 @@ export const metadata: Metadata = {
     "A live tracking system for ration distribution built with Next.js, Prisma, and Tailwind CSS.",
 };
 
-//  ADD THIS
 export const viewport = {
   width: "device-width",
   initialScale: 1,
@@ -32,9 +27,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      // 3. Replaced geist variables with inter.variable
+      className={`${inter.variable} h-full antialiased`}
     >
-      <body className={`${geistSans.variable} font-sans min-h-full flex flex-col`}>{children}</body>
+      {/* 4. Applied inter.variable and tailwind sans utility */}
+      <body className={`${inter.variable} font-sans min-h-full flex flex-col`}>
+        {children}
+      </body>
     </html>
   );
 }

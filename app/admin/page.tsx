@@ -172,7 +172,7 @@ export default function Home() {
           <button
             onClick={handleAdd}
             disabled={loading}
-            className="w-full bg-blue-500 hover:bg-blue-600 transition text-white py-1.5 rounded-xl font-medium disabled:opacity-50"
+            className="w-full bg-blue-500 hover:bg-blue-600 transition text-white py-1.5 rounded-xl font-medium disabled:opacity-50 cursor-pointer"
           >
             {loading ? "Adding..." : "Add Person"}
           </button>
@@ -211,7 +211,7 @@ export default function Home() {
         <button
           onClick={handleDeleteAll}
           disabled={entries.length === 0}
-          className="w-full mt-4 bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl font-medium transition disabled:opacity-50"
+          className="w-full mt-4 bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl font-medium transition disabled:opacity-50 cursor-pointer"
         >
           Delete All Entries
         </button>
